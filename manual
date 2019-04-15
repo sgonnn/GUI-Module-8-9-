@@ -1,0 +1,225 @@
+import sys
+import qdarkstyle
+from PyQt5 import QtWidgets , QtGui
+from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtWidgets import (QApplication, QBoxLayout,  QGridLayout, QGroupBox, QHBoxLayout, QLabel,QSlider, QSpinBox, QStackedWidget,
+							 QWidget,QPushButton)
+
+class MainWindow(QtWidgets.QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        # creating EmailBlast widget and setting it as central
+        self.Window_widget = Window_Manual()
+        self.setCentralWidget(self.Window_widget)
+
+        # filling up a menu bar
+        bar = self.menuBar()
+
+        # Mode menu
+        mode_menu = bar.addMenu('  Mode  ')
+
+        # adding actions to file menu
+        Del_action = QtWidgets.QAction('Deliver', self)
+        SR_action = QtWidgets.QAction('Search&Receive', self)
+        Man_action = QtWidgets.QAction('Manual Control', self)
+        RESET_action = QtWidgets.QAction('Reset', self)
+        close_action = QtWidgets.QAction('Close', self)
+        mode_menu.addAction(Del_action)
+        mode_menu.addAction(SR_action)
+        mode_menu.addAction(Man_action)
+        mode_menu.addAction(RESET_action)
+        mode_menu.addAction(close_action)
+
+        # use `connect` method to bind signals to desired behavior
+        Del_action.triggered.connect(self.Del_page)
+        SR_action.triggered.connect(self.SR_page)
+        Man_action.triggered.connect(self.Man_page)
+        RESET_action.triggered.connect(self.RESET_page)
+        close_action.triggered.connect(self.close)
+
+    def  Del_page(self):
+        print("Deliver Page")
+
+    def  SR_page(self):
+        print("Search&Receive Page")
+
+    def  Man_page(self):
+        print("Manual Control Page")
+
+    def  RESET_page(self):
+        print("RESET Page")
+
+
+class SlidersGroup(QGroupBox):
+
+	valueChanged = pyqtSignal(int)
+
+
+	def __init__(self, orientation, title, parent=None):
+		super(SlidersGroup, self).__init__(title, parent)
+
+		self.slider1 = QSlider(orientation)
+		self.slider1.setFocusPolicy(Qt.StrongFocus)
+		#self.slider1.setTickPosition(QSlider.TicksBothSides)
+		self.slider1.setTickInterval(10)
+		self.slider1.setSingleStep(1)
+		self.slider1.setRange(-180, 180)
+
+
+		self.slider2 = QSlider(orientation)
+		self.slider2.setFocusPolicy(Qt.StrongFocus)
+		self.slider2.setTickPosition(QSlider.TicksBothSides)
+		self.slider2.setTickInterval(10)
+		self.slider2.setSingleStep(1)
+		self.slider2.setRange(0, 840)
+
+
+		self.slider3 = QSlider(orientation)
+		self.slider3.setFocusPolicy(Qt.StrongFocus)
+		self.slider3.setTickPosition(QSlider.TicksBothSides)
+		self.slider3.setTickInterval(10)
+		self.slider3.setSingleStep(1)
+		self.slider3.setRange(-140, 140)
+
+
+		self.slider4 = QSlider(orientation)
+		self.slider4.setFocusPolicy(Qt.StrongFocus)
+		self.slider4.setTickPosition(QSlider.TicksBothSides)
+		self.slider4.setTickInterval(10)
+		self.slider4.setSingleStep(1)
+		self.slider4.setRange(-140, 140)
+
+
+		if orientation == Qt.Horizontal:
+			direction = QBoxLayout.TopToBottom
+		else:
+			direction = QBoxLayout.LeftToRight
+
+		slidersLayout = QBoxLayout(direction)
+		slidersLayout.addWidget(self.slider1)
+		slidersLayout.addWidget(self.slider2)
+		slidersLayout.addWidget(self.slider3)
+		slidersLayout.addWidget(self.slider4)
+
+		self.setLayout(slidersLayout)
+
+	def setValue( self, value, sliderNum ):
+		slider = getattr( self, 'slider{}'.format( sliderNum ) )
+		slider.setValue( value )
+
+
+class Window_Manual(QtWidgets.QWidget):
+	def __init__(self):
+		super(Window_Manual, self).__init__()
+
+		self.horizontalSliders = SlidersGroup(Qt.Horizontal, "Link")
+		self.verticalSliders = SlidersGroup(Qt.Vertical, "Vertical")
+
+		self.stackedWidget = QStackedWidget()
+		self.stackedWidget.addWidget(self.horizontalSliders)
+		self.stackedWidget.addWidget(self.verticalSliders)
+
+		self.createControls("Position's Control")
+
+		self.createControls2("Gripper")
+
+		self.linkButton( )
+
+		layout = QHBoxLayout()
+		layout.addWidget(self.controlsGroup)
+		layout.addWidget(self.stackedWidget,1)
+		layout.addWidget(self.controlsGroup2,1)
+		self.setLayout(layout)
+
+	def createControls(self, title):
+		self.controlsGroup = QGroupBox(title)
+
+		valueLabel_1 = QLabel("Position of link 1 :")
+		valueLabel_2 = QLabel("Position of link 2 :")
+		valueLabel_3 = QLabel("Position of link 3 :")
+		valueLabel_4 = QLabel("Position of link 4 :")
+
+
+		self.valueSpinBox_1 = QSpinBox()
+		self.valueSpinBox_1.setRange(-180, 180)
+		self.valueSpinBox_1.setSingleStep(1)
+
+		self.valueSpinBox_2 = QSpinBox()
+		self.valueSpinBox_2.setRange(0, 840)
+		self.valueSpinBox_2.setSingleStep(1)
+
+		self.valueSpinBox_3 = QSpinBox()
+		self.valueSpinBox_3.setRange(-140, 140)
+		self.valueSpinBox_3.setSingleStep(1)
+
+		self.valueSpinBox_4 = QSpinBox()
+		self.valueSpinBox_4.setRange(-140, 140)
+		self.valueSpinBox_4.setSingleStep(1)
+
+		self.button_1 = QtWidgets.QPushButton('Submit')
+		self.button_2 = QtWidgets.QPushButton('Submit')
+		self.button_3 = QtWidgets.QPushButton('Submit')
+		self.button_4 = QtWidgets.QPushButton('Submit')
+
+		controlsLayout = QGridLayout()
+		controlsLayout.addWidget(valueLabel_1, 0, 0)
+		controlsLayout.addWidget(valueLabel_2, 1, 0)
+		controlsLayout.addWidget(valueLabel_3, 2, 0)
+		controlsLayout.addWidget(valueLabel_4, 3, 0)
+		controlsLayout.addWidget(self.valueSpinBox_1, 0, 1)
+		controlsLayout.addWidget(self.valueSpinBox_2, 1, 1)
+		controlsLayout.addWidget(self.valueSpinBox_3, 2, 1)
+		controlsLayout.addWidget(self.valueSpinBox_4, 3, 1)
+		controlsLayout.addWidget(self.button_1, 0, 2)
+		controlsLayout.addWidget(self.button_2, 1, 2)
+		controlsLayout.addWidget(self.button_3, 2, 2)
+		controlsLayout.addWidget(self.button_4, 3, 2)
+
+		self.controlsGroup.setLayout(controlsLayout)
+
+	def linkButton( self ):
+
+		self.linkSliderToSpinBox( 1, 1 )
+		self.linkSliderToSpinBox( 2, 2 )
+		self.linkSliderToSpinBox( 3, 3 )
+		self.linkSliderToSpinBox( 4, 4 )
+
+	def linkSliderToSpinBox( self, boxNum, sliderNum ):
+
+		def setSpinBox( self, boxNum, sliderNum ):
+			slider = getattr( self.horizontalSliders, 'slider{}'.format( sliderNum ))
+			spinBox =  getattr( self, 'valueSpinBox_{}'.format(boxNum))
+			spinBox.setValue( slider.value( ) )
+
+
+		def setSlider( self, boxNum, sliderNum ):
+			spinBox = getattr( self, 'valueSpinBox_{}'.format(boxNum))
+			self.horizontalSliders.setValue( spinBox.value( ), sliderNum )
+
+		slider = getattr( self.horizontalSliders, 'slider{}'.format( sliderNum) )
+		slider.valueChanged.connect( lambda : setSpinBox( self, boxNum, sliderNum ) )
+
+		spinBox = getattr( self, 'valueSpinBox_{}'.format(boxNum) )
+		spinBox.valueChanged.connect( lambda : setSlider(self, boxNum, sliderNum ) )
+
+	def createControls2(self, title):
+		self.controlsGroup2 = QGroupBox(title)
+
+		onButton = QPushButton("On")
+		offButton = QPushButton("Off")
+
+		controlsLayout2 = QGridLayout()
+		controlsLayout2.addWidget(onButton)
+		controlsLayout2.addWidget(offButton)
+		self.controlsGroup2.setLayout(controlsLayout2)
+
+if __name__ == '__main__':
+    app = QtWidgets.QApplication(sys.argv)
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+    app.setFont(QtGui.QFont("Courier New", 10))
+    # creating main window
+    mw = MainWindow()
+    mw.resize(1200,800)
+    mw.setWindowTitle("Module 8-9 | Group.7")
+    mw.show()
+    sys.exit(app.exec_())
